@@ -31,9 +31,9 @@ project {
 
     vcsRoot(HttpsGithubComLuisEduardoTeamcityCourseCards)
 
-    buildType(id03Firefox)
     buildType(id01FastTest)
     buildType(id02Chrome)
+    buildType(id02Firefox)
     buildType(id03DeployToStaging)
 
     template(Template_1)
@@ -64,6 +64,21 @@ object id02Chrome : BuildType({
     }
 })
 
+object id02Firefox : BuildType({
+    templates(Template_1)
+    id("02Firefox")
+    name = "02. Firefox"
+
+    params {
+        param("Browser", "Firefox")
+    }
+
+    dependencies {
+        snapshot(id01FastTest) {
+        }
+    }
+})
+
 object id03DeployToStaging : BuildType({
     id("03DeployToStaging")
     name = "03. Deploy to Staging"
@@ -75,22 +90,14 @@ object id03DeployToStaging : BuildType({
     dependencies {
         snapshot(id02Chrome) {
         }
-        snapshot(id03Firefox) {
+        snapshot(id02Firefox) {
         }
     }
-})
-
-object id03Firefox : BuildType({
-    templates(Template_1)
-    id("03Firefox")
-    name = "02. Firefox"
-
-    params {
-        param("Browser", "Firefox")
-    }
-
-    dependencies {
-        snapshot(id01FastTest) {
+    
+    triggers {
+        vcs {
+            id = "vcsTrigger"
+            branchFilter = ""
         }
     }
 })
@@ -113,13 +120,6 @@ object Template_1 : Template({
             name = "Test"
             id = "RUNNER_7"
             scriptContent = "npm test -- --single-run --browsers %Browser% --colors false --reporters teamcity"
-        }
-    }
-
-    triggers {
-        vcs {
-            id = "vcsTrigger"
-            branchFilter = ""
         }
     }
 })
